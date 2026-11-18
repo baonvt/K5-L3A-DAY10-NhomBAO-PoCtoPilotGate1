@@ -5,7 +5,7 @@
 - Tên nhóm (`TenNhom`, không dấu, không khoảng trắng): `NhomBAO`
 - Lớp: `L3A`
 - Repo bài làm: `K5-L3A-DAY10-NhomBAO-PoCtoPilotGate1`
-- Thẻ sự cố đã bốc (S1–S8): chưa bốc
+- Thẻ sự cố đã bốc (S1–S8): `S1`
 
 ## Thành viên
 
