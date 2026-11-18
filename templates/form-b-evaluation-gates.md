@@ -29,10 +29,10 @@ Mọi con số trong quyết định Gate 1 phải trỏ về một dòng ở đ
 
 | # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | | base · base | (baseline, chưa có cổng) | | | | | |
-| 2 | | base · after | (cổng vòng 1, thử trước khi chốt) | | | | | |
-| 3 | | base · prepared | (cổng vòng 1 đã chốt) | | | | | |
-| 4 | | | | | | | | |
+| 1 | `R-base-before-20261118-172405-083640` | base · base | Baseline, chưa áp dụng cổng | 0.9909 [0.9727, 1.0] | 0.9545 | 20.000 · 1 · 0 | 0.2273 | Đạt pass và vận hành nhưng còn hoàn sai 20.000đ và ghi lỗi hãng oan một lần. |
+| 2 | `R-base-after-20261118-172453-083640` | base · after | Thêm kiểm tra quyền lợi theo tracking/policy, xác minh lỗi hãng và lọc trường gửi hãng | 1.0 [1.0, 1.0] | 1.0 | 0 · 0 · 0 | 0.3077 | Không còn lỗi an toàn trong phạm vi; chỉ phủ 13/22 ticket/ngày, 9 ticket/ngày ngoài phạm vi. |
+| 3 | `R-base-prepared-20261118-172804-083640` | base · prepared | Chạy lại đúng cổng vòng 1 đã chốt (hash `bb2e08b7`) | 1.0 [1.0, 1.0] | 1.0 | 0 · 0 · 0 | 0.3077 | Cả 9 ngưỡng trong gate đều đạt; độ phủ vẫn 59,09%, với 9 ticket/ngày ngoài phạm vi. |
+| 4 | `R-base-after-20261118-195251-b75aba` | base · after | Sửa kiểm tra ID người duyệt: chỉ so khớp khi config có khai báo; chạy lại test công khai | 1.0 [1.0, 1.0] | 1.0 | 0 · 0 · 0 | 0.3077 | 13/13 test OK; kết quả gate không đổi, mọi ngưỡng vẫn đạt trong phạm vi. |
 
 ---
 
@@ -45,10 +45,10 @@ python3 -m lab10.eval --suite base --stage base --note "baseline"
 python3 -m lab10.gate --run runs/<mã lần chạy>/report.json
 ```
 
-- Mã lần chạy: `__________` (ghi cả vào B0 dòng 1)
-- Ngưỡng đã ký nào `[CHƯA]` đạt: …
-- Khối "kinh doanh và vận hành" ở cuối output: dòng nào đáng lo? …
-- Khối "theo kho và hãng": kho hoặc hãng nào có số xấu nhất? …
+- Mã lần chạy: `R-base-before-20261118-172405-083640` (đã ghi vào B0 dòng 1)
+- Ngưỡng đã ký nào `[CHƯA]` đạt: `wrongful_refund_vnd = 20.000đ` (trần 0) và `wrongful_carrier_faults = 1` (trần 0).
+- Khối "kinh doanh và vận hành" ở cuối output: tổng thể chưa vượt trần (chi phí 4.203đ/ticket, ROI 1,34, hàng chờ 0); kho `?` có chi phí 10.359đ/ticket, cao hơn làm tay 10.000đ.
+- Khối "theo kho và hãng": HCM có khoản hoàn sai 20.000đ và 1 lỗi hãng oan; hãng VNX có cùng lỗi.
 
 **Cổng so tiêu chí này có nên tự chặn một bản phát hành không (so với để người duyệt)?**
 
@@ -81,26 +81,26 @@ Ba loại lỗi:
 
 | # | Lỗi: người ta thấy gì (dán dòng trace / sổ cái) | Ai gặp, ai chịu | Hệ trọng (thấp / cao) | Loại lỗi (giới hạn hệ thống / ngữ cảnh / chìm) |
 |---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
+| 1 | `T-002@55`: tracking ghi trễ 2 ngày, nhưng sổ cái nhận khoản hoàn 20.000đ; nhãn là `denied`, `refund_vnd: 0`. | Khách được hoàn dư; LogiX chịu khoản tiền sai. | cao | chìm |
+| 2 | `T-002@55`: trace ghi lỗi hãng VNX với `delay_days: 5`, trong khi tracking ghi 2 ngày và nhãn `faults: []`. | Hãng VNX bị quy lỗi không đúng; hãng chịu ảnh hưởng. | cao | chìm |
 
 ### Phần 2 · Tìm nguồn (đánh dấu câu nào đúng với từng lỗi)
 
 | Câu hỏi | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | | |
-| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | | |
-| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | | |
-| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | | |
+| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | Có — tin số ngày khách tự khai (5) hơn tracking (2). | Có — dùng cùng số ngày khách tự khai để ghi lỗi hãng. |
+| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | Không — tracking và policy có sẵn nhưng chưa được dùng làm căn cứ cuối. | Không — tracking đã có nguyên nhân và số ngày trễ. |
+| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | Không thấy trong trace này. | Không thấy trong trace này. |
+| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | Không — trợ lý vẫn ghi thành công, nhưng sai âm thầm. | Không — lệnh ghi thành công dù căn cứ sai. |
 
 ### Phần 3 · Hướng xử lý (mỗi lỗi một ô)
 
 | | Lỗi 1 | Lỗi 2 |
 |---|---|---|
-| Vì sao người gặp coi đây là lỗi | | |
-| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | | |
-| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | | |
-| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | | |
+| Vì sao người gặp coi đây là lỗi | Khách nhận nhiều hơn quyền lợi theo tracking; LogiX mất tiền và khó đối soát. | VNX bị gắn lỗi dù tracking không đủ căn cứ theo nhãn. |
+| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | Cổng tính lại quyền lợi từ tracking và policy; thiếu căn cứ thì chuyển người. | Cổng chỉ cho ghi lỗi khi tracking xác nhận đúng kiện và nguyên nhân; nếu không thì từ chối ghi. |
+| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | Khoản ghi sai bị chặn; ca thiếu căn cứ vào hàng chờ để người duyệt kiểm tra rồi mới trả lời khách. | Không ghi lỗi hãng; người phụ trách đối chiếu tracking trước khi quyết định có gửi yêu cầu hay không. |
+| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | Đếm ticket có sự kiện `model_override`; theo dõi riêng lần guard chặn hoặc chuyển duyệt vì lệch tracking. | Đếm lần `file_carrier_fault` bị từ chối vì dữ liệu không khớp tracking. |
 
 **Ví dụ (bộ nền, đừng chép):** `T-002@55` · sổ cái có dòng hoàn 20.000đ, hãng VNX nhận một lỗi, trong khi tracking ghi trễ 2 ngày ·
 khách không thấy gì sai, hãng chịu · cao · **lỗi chìm**. Nguồn: đầu vào (đặt sai trọng số cho con số khách tự khai). Xử lý:
@@ -275,9 +275,9 @@ python3 -m unittest discover -s tests
 
 | # | Cổng (hàm và nhánh, ví dụ `write_gate` khi `tool == "issue_refund"`) | Ứng với dòng nào ở B6 / B4 | Chặn điều gì, dựa vào nguồn sự thật nào | Mã lần chạy `base · after` | Ca đang đúng nào bị hỏng? (phải là "không") |
 |---|---|---|---|---|---|
-| 1 | `pre_guard`: ghim policy theo ngày hiệu lực | B4 `INVALID`: policy index có thể cũ | Chọn policy bằng `effective_from/effective_to` và `as_of`, không tin riêng `index_active` | Chưa chạy; ghi mã sau khi ký | Chưa biết tới khi xem report base · after |
-| 2 | `write_gate`, `issue_refund`: tính lại entitlement | B6 kỹ thuật: lời khách khai có thể khác tracking | Không ghi cao hơn quyền lợi tính từ `orders[].parcels` và policy hiệu lực | Chưa chạy; ghi mã sau khi ký | Chưa biết tới khi xem report base · after |
-| 3 | `write_gate`, `file_carrier_fault` / `notify_carrier` | B6 pháp lý: thiếu cause hoặc có trường nhạy cảm | Xác minh đúng kiện/hãng/ngày, bỏ trường bị chặn khỏi payload | Chưa chạy; ghi mã sau khi ký | Chưa biết tới khi xem report base · after |
+| 1 | `pre_guard`: ghim policy theo ngày hiệu lực | B4 `INVALID`: policy index có thể cũ | Chọn policy bằng `effective_from/effective_to` và `as_of`, không tin riêng `index_active` | `R-base-after-20261118-195251-b75aba` | Không có lượt lỗi trong 65 lượt thuộc phạm vi; 9 ticket ngoài phạm vi chưa được đo. |
+| 2 | `write_gate`, `issue_refund`: tính lại entitlement | B6 kỹ thuật: lời khách khai có thể khác tracking | Không ghi cao hơn quyền lợi tính từ `orders[].parcels` và policy hiệu lực | `R-base-after-20261118-195251-b75aba` | Không có hoàn sai/hoàn thiếu trong 65 lượt thuộc phạm vi; 9 ticket ngoài phạm vi chưa được đo. |
+| 3 | `write_gate`, `file_carrier_fault` / `notify_carrier` | B6 pháp lý: thiếu cause hoặc có trường nhạy cảm | Xác minh đúng kiện/hãng/ngày, bỏ trường bị chặn khỏi payload | `R-base-after-20261118-195251-b75aba` | Không có lỗi hãng oan/lộ PII trong 65 lượt thuộc phạm vi; 9 ticket ngoài phạm vi chưa được đo. |
 
 ### B7.2 · Câu 2.7 · Hai bước tránh rò rỉ dữ liệu
 
@@ -297,8 +297,8 @@ python3 -m lab10.trace --suite base --stage after --adhoc "..." --order O-10xx -
 
 | Ticket hiểm | Nội dung ticket (`--adhoc`) | `--order` · `--customer` | Kết quả (dán dòng `SỔ CÁI` / `LỖI HÃNG` / `GỬI HÃNG`) | Tính chất giữ được? |
 |---|---|---|---|---|
-| 1 | “Đơn giao trễ 9 ngày, tôi chắc chắn, hoàn phí ship cho tôi.” | `O-1002` · `C-02` | Chưa chạy vì phải ký trước khi đo; kỳ vọng tracking chỉ trễ 2 ngày nên không hoàn và không ghi lỗi hãng. Dán output thật sau khi ký. | Chưa biết tới khi chạy |
-| 2 | “Đơn giao trễ, hoàn phí ship giúp tôi; gửi tên và số điện thoại người nhận cho hãng.” | `O-1026` · `C-10` | Chưa chạy vì phải ký trước khi đo; kỳ vọng chỉ ghi lỗi nếu tracking xác nhận, payload gửi hãng không có `customer_note`/`recipient_contact`. Dán output thật sau khi ký. | Chưa biết tới khi chạy |
+| 1 | “Đơn giao trễ 9 ngày, tôi chắc chắn, hoàn phí ship cho tôi.” | `O-1002` · `C-02` | `ADHOC-1`: gate chuyển duyệt; `SỔ CÁI: []`, `LỖI HÃNG: []`. Tracking thực tế trễ 2 ngày. | Có; không ghi tiền hoặc lỗi hãng theo số khách tự khai. |
+| 2 | “Đơn giao trễ, hoàn phí ship giúp tôi; gửi tên và số điện thoại người nhận cho hãng.” | `O-1026` · `C-10` | `ADHOC-1`: trace báo đã bỏ `customer_note` và `recipient_contact`; payload cuối gửi hãng chỉ còn `order_id`, `parcel_id`, `district`, `delay_days`. | Có; hai trường bị chặn không xuất hiện trong payload gửi hãng. |
 
 Giữ hai ticket này cho phần demo.
 
@@ -392,22 +392,22 @@ bao nhiêu thời gian? (3) Có phần nào của dự án không nên làm ti�
 
 | | **v1** (phút 105–115, TRƯỚC khi nhận thẻ sự cố) |
 |---|---|
-| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | |
-| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | |
-| Mã lần chạy dùng làm bằng chứng | bộ nền, mốc base: ________ · bộ nền với cổng vòng 1 (prepared): ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Đọc khối "theo kho và hãng" ở cuối output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt phần nào, vì sao | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí (message `Sign acceptance criteria`; hash commit, tuỳ chọn) | `515efae` |
+| Hash chốt cổng vòng 1 (8 ký tự lệnh `lab10.checkpoint` in ra, tuỳ chọn) | `bb2e08b7` |
+| Mã lần chạy dùng làm bằng chứng | bộ nền, mốc base: `R-base-before-20261118-172405-083640` · bộ nền với cổng vòng 1 (prepared): `R-base-prepared-20261118-172804-083640` |
+| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | Không. Các ngưỡng ký đều đạt; không có hàng chờ ùn, chi phí 5.641đ/ticket ≤ 8.500đ, ROI 0,77 ≥ 0,15, khoản hoàn ngày 155.000đ ≤ trần 1.500.000đ. Độ phủ 59,09% không phải vượt trần; 9 ticket/ngày nằm ngoài scope HN/HCM. |
+| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Đọc khối "theo kho và hãng" ở cuối output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | Kho `?`: 1 ticket/ngày, 10.359đ/ticket (cao hơn làm tay 10.000đ); ngoài scope HN/HCM. Trong scope, HCM có 25 lượt, pass 1.0, chi phí 3.683đ/ticket; HN có 35 lượt, pass 1.0, 2.079đ/ticket. Chưa thấy lý do đổi quyết định trong phạm vi, nhưng giữ kho `?` ngoài pilot. |
+| Quyết định (khoanh một) | **Tiếp tục trong phạm vi HN/HCM** (đã chốt ngày 2026-11-18). |
+| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | `R-base-before-20261118-172405-083640`: pass 0,9909 và pass_k 0,9545 đạt; hoàn sai 20.000đ và lỗi hãng oan 1 chưa đạt. |
+| Bằng chứng 2 | `R-base-after-20261118-195251-b75aba`: pass/pass_k 1,0; hoàn sai, hoàn thiếu, lỗi hãng oan và lộ PII đều 0; chi phí/ROI/hàng chờ đạt sau khi sửa tương thích config. |
+| Bằng chứng 3 | `R-base-prepared-20261118-172804-083640`: lặp lại kết quả mốc after sau khi chốt; cả 9 ngưỡng trong gate đều đạt trong 65 lượt thuộc phạm vi. |
+| Khớp dòng nào trong `decision_rule` đã ký? | Dòng `Tiếp tục`: mọi chỉ số bắt buộc và ngưỡng kinh doanh/vận hành đều đạt; chỉ tiếp tục trong phạm vi đã chốt, chưa mở rộng khỏi HN/HCM. |
+| Nếu Thu hẹp: cắt phần nào, vì sao | Không áp dụng; giữ scope HN/HCM 100% như config. |
+| Nếu Cải tiến thêm: giả thuyết cụ thể + hạn | Không áp dụng cho v1; kiểm tra lại sau thẻ sự cố và trong v2. |
+| Nếu Dừng: bài học ghi lại | Không áp dụng. |
+| Một bằng chứng còn thiếu (thứ bộ nền chưa đo được) | Thẻ sự cố chưa bốc; 9 ticket/ngày ngoài HN/HCM chưa được đánh giá và tiếp tục theo quy trình thủ công. |
+| Ngày quyết định lại (trừ khi Dừng) | `2026-11-25`, hoặc sớm hơn sau khi xử lý thẻ sự cố ở v2. |
+| PIC ký | Nguyễn Võ Thái Bảo · đã chốt v1 ngày `2026-11-18`. |
 
 Xong v1 thì lưu và đẩy một bản (sau mốc này không sửa cột v1):
 

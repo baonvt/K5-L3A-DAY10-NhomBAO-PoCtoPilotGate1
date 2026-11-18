@@ -76,13 +76,14 @@ def write_gate(ctx, action):
             return Verdict.escalate("bên chi trả không hợp lệ")
         approval_id = action.get("approval_id")
         approval = None
+        required_approver_id = (ctx.gates or {}).get("operations", {}).get("approver_id")
         if requested > policy["auto_limit_vnd"] or payer != "LOGIX" or approval_id:
             approvals = ctx.tools.lookup_approvals(approval_id=approval_id)
             approval = approvals[0] if approvals else None
             if (approval is None or approval.get("ticket_id") != action.get("ticket_id")
                     or approval.get("order_id") != action.get("order_id")
                     or approval.get("customer_id") != order.get("customer_id")
-                    or approval.get("approver_id") != (ctx.gates or {}).get("operations", {}).get("approver_id")
+                    or (required_approver_id and approval.get("approver_id") != required_approver_id)
                     or approval.get("status") != "valid" or approval.get("expires_at", "") < as_of
                     or approval.get("max_vnd", 0) < requested):
                 return Verdict.escalate("khoản vượt hạn mức hoặc do shop chi trả chưa có phê duyệt hợp lệ cho ticket này")
