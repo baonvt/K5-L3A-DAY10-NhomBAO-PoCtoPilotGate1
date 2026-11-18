@@ -31,4 +31,6 @@ Phụ trách ba vai của lab. Làm các câu 1.1–3.7 và phiếu A, B, C; đ�
 
 ### Exit ticket
 
-Tự viết sau buổi học: một điều tôi hiểu rõ hơn và một điều tôi còn chưa chắc.
+Qua thẻ S1, em hiểu là số ngày khách tự kể không nên làm căn cứ cuối để hoàn tiền hay ghi lỗi hãng; phải đối chiếu tracking. Nếu trạng thái giao và ngày giao mâu thuẫn thì nên chuyển người kiểm tra.
+
+Em còn chưa chắc hệ thống thật có lưu đủ lịch sử lỗi GHSH trong 7 ngày để biết trước ngưỡng tạm ngưng tuyến hay không. Bộ dữ liệu mock hiện tại không có lịch sử lỗi kèm thời gian để kiểm tra việc đó.
