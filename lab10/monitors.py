@@ -19,7 +19,17 @@ def escalation_rate(trials):
     return sum(t["status"] == "escalated" for t in trials) / max(1, len(trials))
 
 
+def customer_delay_claim_redaction_rate(trials):
+    """Share of tickets where a customer supplied a numeric delay claim."""
+    redacted = sum(
+        any(e.get("kind") == "customer_delay_claim_redacted" for e in t.get("events", []))
+        for t in trials
+    )
+    return redacted / max(1, len(trials))
+
+
 MONITORS = {
     "escalation_rate": escalation_rate,     # có sẵn; KHÔNG tính là metric mới của đội
+    "customer_delay_claim_redaction_rate": customer_delay_claim_redaction_rate,
 }
 STARTER_MONITORS = ("escalation_rate",)

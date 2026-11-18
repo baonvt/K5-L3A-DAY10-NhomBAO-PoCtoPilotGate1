@@ -1,447 +1,243 @@
-# Phiếu C · Sự cố và quyết định v2 · Khối 3 (phút 125–200)
+# Phiếu C · Sự cố và quyết định v2 · Khối 3
 
-**Bàn:** `NhomBAO` · **Thẻ đã bốc:** `S1`
-
-Mở `incidents/Sx/card.md` của đúng số đã bốc. Các bước trên thẻ trỏ về đúng mục trong phiếu này. Mục C3 chỉ điền phần ứng với
-số thẻ của bàn; các phần khác để trống.
-
-**Mục lục**
-- [C0 · Nhật ký lần chạy vòng 2 (suốt khối)](#c0)
-- [C1 · Câu 3.0 · Mốc prepared và đối chiếu pre-mortem · phút 125–135 · bước 0 trên thẻ](#c1)
-- [C2 · Câu 3.1 · Bảng soát lỗi của thẻ · phút 135–145 · bước 1–2](#c2)
-- [C3 · Câu 3.1 · Phần riêng theo thẻ · phút 135–145 · bước 3](#c3)
-- [C4 · Câu 3.1 · HAZOP của thẻ (≥ 3 dòng) · phút 145–150 · bước 4](#c4)
-- [C5 · Câu 3.2, 3.3 · Specification và giả định môi trường · phút 145–150 · bước 4](#c5)
-- [C6 · Câu 3.4 · Fault tree TRƯỚC khi sửa · phút 150–155 · bước 4](#c6)
-- [C7 · Câu 3.5 · Bảng sửa: nguyên nhân → chỗ sửa → giảm hay ngăn · phút 155–180 · bước 5–7](#c7)
-- [C8 · Câu 3.6 · Chỉ số theo dõi mới · phút 155–180 · bước 5](#c8)
-- [C9 · Câu 3.7 · Fault tree SAU khi sửa · phút 180–185 · bước 8](#c9)
-- [C10 · Câu 3.7 · Risk register (≥ 1 dòng) · phút 180–185 · bước 8](#c10)
-- [C11 · Câu 3.7 · Cập nhật checklist 9 nhóm việc và Runbook phần 4–5 · phút 180–185 (runbook có thể xong trong 185–200) · bước 8](#c11)
-- [C12 · Quyết định Gate 1 · v2 và ba dòng bắt buộc · phút 185–200 · bước 9](#c12)
-
----
-
-<a id="c0"></a>
+**Bàn:** NhomBAO · **Thẻ đã bốc:** S1
 
 ## C0 · Nhật ký lần chạy vòng 2
 
-Mỗi lệnh `lab10.eval` và `lab10.grade` tự ghi một dòng vào `runs/journal.jsonl`. Điền cột "Đổi MỘT thứ gì" (tham số `--note`) và "Kết luận".
+| # | Mã lần chạy | Bộ · mốc | Đổi một thứ gì | pass_rate (CI 95%) | pass_k | Hoàn sai · lỗi hãng oan · PII | Tỉ lệ chuyển người | Kết luận |
+|---|---|---|---|---|---:|---|---:|---|
+| 1 | R-S1-prepared-20261118-210442-4fe294 | S1 · prepared | Nhận đúng S1; chỉ còn cổng vòng 1 | 0,75 [0,50–1,00] | 0,75 | 0đ · 0 · 0 | 0,375 | Chặn hoàn sai và lỗi hãng oan, nhưng còn hoàn thiếu 105.000đ và chưa đạt hai ngưỡng ký. |
+| 2 | R-S1-after-20261118-204758-b76fea | S1 · after | Dùng tracking thay số ngày khách tự khai khi xử lý yêu cầu; thêm theo dõi tỷ lệ số ngày được ẩn | 1,00 [1,00–1,00] | 1,00 | 0đ · 0 · 0 | 0,125 | Hai lỗi S1-03/S1-07 hết; không có hoàn thiếu trong 40 lượt. |
+| 3 | R-S1-after-20261118-210429-4fe294 | S1 · after | Chuyển người khi status và ngày giao trong tracking mâu thuẫn | 1,00 [1,00–1,00] | 1,00 | 0đ · 0 · 0 | 0,125 | Không làm đổi kết quả S1; thêm chốt an toàn cho dữ liệu không nhất quán. |
+| 4 | R-base-after-20261118-210435-4fe294 | base · after | Kiểm hồi quy sau các cổng mới | 1,00 [1,00–1,00] | 1,00 | 0đ · 0 · 0 | 0,3077 | 65 lượt bộ nền đều đạt, không có ca mới hỏng. |
 
-| # | Mã lần chạy | Bộ ticket · mốc | Đổi MỘT thứ gì so với lần trước | pass_rate (khoảng tin cậy 95%) | pass_k | Hoàn sai (đ) · lỗi hãng oan · lộ dữ liệu | Tỉ lệ chuyển người | Kết luận (một câu) |
-|---|---|---|---|---|---|---|---|---|
-| 1 | | Sx · prepared | nhận thẻ đã bốc, chưa sửa thêm (đúng cổng vòng 1 đã chốt) | | | | | |
-| 2 | | Sx · after | | | | | | |
-| 3 | | Sx · after | | | | | | |
-| 4 | | base · after | (kiểm không regression) | | | | | |
+Report tự kiểm tra cuối: R-S1-grade-20261118-210442-4fe294. Các mã base, prepared, after trong report: R-S1-before-20261118-210442-4fe294, R-S1-prepared-20261118-210442-4fe294, R-S1-after-20261118-210443-4fe294.
 
 ---
-
-<a id="c1"></a>
 
 ## C1 · Câu 3.0 · Mốc prepared và đối chiếu pre-mortem
 
-Chạy **trước khi sửa bất cứ thứ gì**:
+- Mã grade: R-S1-grade-20261118-210442-4fe294 · base: R-S1-before-20261118-210442-4fe294 · prepared: R-S1-prepared-20261118-210442-4fe294.
+- Cổng vòng 1 giảm lỗi rõ: trên gói S1, hoàn sai giảm từ 985.000đ xuống 0đ; lỗi hãng oan từ 30 xuống 0. Tỉ lệ đạt tăng từ 0,3077 lên 0,75. Tuy vậy còn hoàn thiếu 105.000đ; S1-03 và S1-07 vẫn hỏng. Hai ngưỡng ký chưa đạt ở prepared: pass_rate 0,75 < 0,85 và pass_k 0,75 < 0,80.
+- Không có trần vận hành/kinh doanh nào bị vượt ở prepared. ROI 0,34; chi phí 7.452đ/ticket so với làm tay 10.000đ; LLM cao nhất 766đ so với trần 1.500đ; tiền hoàn tự động 38.000đ so với trần bàn 1.500.000đ; hàng chờ không ùn.
 
-```bash
-python3 -m lab10.grade --incident Sx
-```
+**Bổ sung vòng 2 (đánh dấu khác màu trên bản giấy):** B6 đã nêu khách có thể khai sai số ngày, nhưng cổng vòng 1 chỉ chặn hoàn vượt quyền lợi và thiếu nguyên nhân; nó chưa loại số khách tự khai khỏi quyết định nên vẫn gây hoàn thiếu, và cổng ghi hãng từ chối cả số ngày bị model ghi sai. Rủi ro dữ liệu chưa được tính tới: parcel có status DELIVERED nhưng delivered_date trống. B3 còn ghi “ngày giao trống nghĩa là chưa giao”, giả định này không đúng với O-2120-P1 và O-2121-P1.
 
-- Mã lần chạy grade: `__________` · base: `__________` · prepared: `__________`
-- Cổng vòng 1 đỡ được ô / con số nào (so cột base với cột prepared): …
-- Khối kinh doanh và vận hành còn dòng nào vượt trần: …
+Sự cố nằm ở lăng kính kỹ thuật và dữ liệu; hậu quả chạm tới tiền và quan hệ pháp lý với hãng. Phần còn thiếu trong pre-mortem là kiểm tra tính nhất quán giữa status và ngày giao, và việc thiếu lịch sử lỗi hãng theo cửa sổ 7 ngày.
 
-**Mở lại pre-mortem (Phiếu B mục B6), viết bằng bút khác màu.** Với thẻ S1, S3, S4, S5 đây là một phần của phần riêng theo thẻ.
-
-- Sự cố trên thẻ thuộc lăng kính nào (kỹ thuật, kinh doanh, con người và vận hành, pháp lý)? …
-- Có nằm trong các lý do bàn đã viết không? Nếu có: cổng vòng 1 đã đỡ được bao nhiêu (đọc cột prepared trong report)? Nếu không: vì sao cả bàn không nghĩ tới? …
-- Lý do còn thiếu, thêm bây giờ:
-
-| Lý do thất bại (viết ở thì quá khứ) | Lăng kính | Kiểm được bằng gì (trace / data / config nào) |
+| Lý do thất bại đã xảy ra | Lăng kính | Kiểm được bằng gì |
 |---|---|---|
-| | | |
+| Model đã dùng số ngày khách tự khai để tính quyền lợi và đề xuất số ngày ghi lỗi hãng. | Kỹ thuật | S1-03@11, S1-07@11: model_override, tracking, proposal. |
+| Dữ liệu đã để trạng thái DELIVERED đi cùng delivered_date trống; helper tính ngày đến as_of và không đọc status. | Dữ liệu | S1-20@11 và world_patch: O-2120-P1. |
+| Chưa có lịch sử đối soát đủ 7 ngày để biết GHSH đã gần ngưỡng tạm ngưng tuyến hay chưa. | Vận hành / pháp lý | data/world.json có ngưỡng của GHSH nhưng không có sổ lỗi có timestamp 7 ngày. |
 
 ---
-
-<a id="c2"></a>
 
 ## C2 · Câu 3.1 · Bảng soát lỗi của thẻ
 
-Dò ít nhất 2 ticket hỏng theo kiểu KHÁC nhau:
+**Tác hại:** GHSH bị ghi lỗi/đối soát sai và khách nhận tiền sai; đo bằng số tiền hoàn, số lỗi hãng sai và pass_rate. Ở base S1: hoàn sai 985.000đ, hoàn thiếu 105.000đ, 30 lỗi hãng oan trên 65 lượt; pass_rate 0,3077.
 
-```bash
-python3 -m lab10.trace --suite Sx --ticket <ID> --seed 11
-```
+### Phần 1 · Ghi lỗi
 
-Ba loại lỗi: **giới hạn của hệ thống** · **lỗi ngữ cảnh** · **lỗi chìm** (cả người dùng lẫn hệ thống đều không nhận ra; nguy hiểm nhất,
-người chịu hại thường là bên thứ ba). Định nghĩa đầy đủ và ví dụ: Phiếu B mục B2.
-
-**Tác hại của thẻ:** cho ai `____` · đo bằng gì `____` · bao nhiêu ở mốc base `____`
-
-### Phần 1 · Ghi lỗi (bằng chứng là mã ticket@seed và dòng trace, không tả chung chung)
-
-| # | Lỗi: người ta thấy gì (dán dòng trace / sổ cái) | Ai gặp, ai chịu | Hệ trọng (thấp / cao) | Loại lỗi (giới hạn hệ thống / ngữ cảnh / chìm) |
+| # | Lỗi và bằng chứng | Ai gặp, ai chịu | Hệ trọng | Loại lỗi |
 |---|---|---|---|---|
-| 1 | | | | |
-| 2 | | | | |
-| 3 | | | | |
+| 1 | S1-03@11: khách ghi 9 ngày; tracking ghi 4; model_override dùng 9; đề xuất 110.000đ thay vì 30.000đ. Cổng prepared cắt tiền về 30.000đ nhưng từ chối file_carrier_fault vì delay_days=9. | LogiX chịu khoản hoàn sai; GHSH nhận số ngày sai nếu lệnh lọt qua. | Cao | Lỗi chìm đối với hãng; hệ thống không nhận ra số ngày mình đã ghi là sai. |
+| 2 | S1-07@11: khách ghi 2 ngày; tracking ghi 4; model_override dùng 2, trả lời từ chối và hoàn 0đ dù nhãn đúng là 21.000đ cùng lỗi VNX. | Khách bị thiếu quyền lợi và mất tin tưởng; CSKH phải nhận khiếu nại. | Cao | Giới hạn của hệ thống: model không giữ được tracking làm căn cứ khi số khách khác đi. |
+| 3 | S1-20@11: O-2120-P1 có status DELIVERED, delivered_date null; helper tính 6 ngày từ promised_date đến as_of. Agent hoàn 22.000đ và ghi GHSH lỗi, trong khi nhãn yêu cầu chuyển người. | GHSH chịu lỗi không có căn cứ; LogiX trả tiền sai; khách có thể không biết dữ liệu mâu thuẫn. | Cao | Lỗi chìm do dữ liệu không nhất quán. |
 
-### Phần 2 · Tìm nguồn (đánh dấu câu nào đúng với từng lỗi)
+### Phần 2 · Tìm nguồn
 
 | Câu hỏi | Lỗi 1 | Lỗi 2 | Lỗi 3 |
 |---|---|---|---|
-| **Đầu vào:** hệ thống có tự diễn giải / sửa đầu vào của người dùng theo cách họ không lường? Có đặt sai trọng số cho một lời nói hay tín hiệu của người dùng? | | | |
-| **Độ liên quan:** hệ thống có thiếu dữ liệu cần để quyết đúng? Dữ liệu vào có nhiễu, thiếu ổn định? | | | |
-| **Thứ bậc hệ thống:** có hai hệ thống cùng ghi / cùng theo dõi một thứ mà không rõ bên nào là chủ (ví dụ CSKH hoàn tay và trợ lý cùng ghi sổ)? | | | |
-| **Trạng thái hỏng:** nhiều lỗi cộng lại có làm tính năng không dùng được (ví dụ LLM lỗi liên tiếp)? | | | |
+| Đầu vào | Có: lời khách “9 ngày” lấn át tracking. | Có: lời khách “2 ngày” lấn át tracking theo chiều ngược lại. | Một phần: lời khách nói đã nhận hàng, nhưng dữ liệu parcel mâu thuẫn. |
+| Độ liên quan / chất lượng dữ liệu | Tracking có đủ; agent không dùng làm nguồn cuối. | Tracking có đủ; agent không dùng làm nguồn cuối. | Có: delivered_date trống nhưng status báo đã giao; hàm tính ngày bỏ qua status. |
+| Thứ bậc hệ thống | Không thấy hai hệ thống cùng ghi. | Không thấy hai hệ thống cùng ghi. | Chưa có nguồn dữ liệu đối soát nào giải quyết mâu thuẫn trạng thái và ngày. |
+| Trạng thái hỏng | Không; lệnh vẫn chạy và có thể ghi sai âm thầm. | Không; hệ thống trả lời được nhưng sai quyền lợi. | Không; hệ thống tự hoàn tất thay vì dừng để xác minh. |
 
-### Phần 3 · Hướng xử lý (mỗi lỗi một ô)
+### Phần 3 · Hướng xử lý
 
 | | Lỗi 1 | Lỗi 2 | Lỗi 3 |
 |---|---|---|---|
-| Vì sao người gặp coi đây là lỗi | | | |
-| Kiểu giải pháp: phản hồi cho người dùng / trao quyền kiểm soát cho người / khác | | | |
-| Đường đi của người sau khi có giải pháp (ví dụ: ticket chuyển sang người duyệt → duyệt → khách được trả lời) | | | |
-| Hệ thống học được gì (tín hiệu ghi lại để theo dõi: tên metric trong `monitors.py`) | | | |
-
-Yêu cầu: ít nhất **hai lỗi có nguồn khác nhau** ở phần 2, và ít nhất một lỗi được xếp đúng là **lỗi chìm**.
+| Vì sao người gặp coi đây là lỗi | Số ngày ghi cho hãng không khớp tracking, và số tiền hoàn không đúng chính sách. | Khách đủ điều kiện theo tracking nhưng bị từ chối. | Không thể lấy ngày hiện tại thay cho ngày giao thực tế khi hai trường dữ liệu mâu thuẫn. |
+| Giải pháp | Ẩn số ngày khách tự khai trước khi model đọc; cổng ghi hãng đối chiếu parcel. | Model tính lại từ tracking sau khi claim bị ẩn; nếu thiếu dữ liệu thì chuyển người. | Tạm dừng ticket mâu thuẫn, người đối soát xác minh rồi mới hoàn/ghi lỗi. |
+| Đường đi sau giải pháp | Tracking hợp lệ → tính lại → ghi lỗi đúng hãng, gửi payload đã bỏ trường bị chặn. | Tracking đủ → hoàn 21.000đ và ghi VNX đúng; thiếu thì vào hàng chờ. | Chuyển người; không hoàn và không ghi lỗi cho đến khi sửa nguồn. |
+| Tín hiệu theo dõi | customer_delay_claim_redaction_rate; wrongful_carrier_faults. | customer_delay_claim_redaction_rate; pass_rate và under_refund_vnd. | wrongful_carrier_faults trong report; tracking_fields_inconsistent trong log để người đối soát xem. |
 
 ---
 
-<a id="c3"></a>
+## C3 · Câu 3.1 · Phần riêng theo thẻ
 
-## C3 · Câu 3.1 · Phần riêng theo thẻ (chỉ điền phần của số đã bốc; làm trong khoảng 5 phút)
+Chỉ điền phần S1 yêu cầu là C3.5.
 
-| Thẻ | Điền phần nào |
-|---|---|
-| S1 | Mục C1 (đối chiếu pre-mortem) + **C3.5** (mở lại bản đồ dữ liệu: các trường của `parcel`) |
-| S2 | **C3.1** Mức kiểm soát của con người |
-| S3 | Mục C1 + **C3.5** (bảng `policies`: trường nào là nguồn sự thật về "phiên bản đang hiệu lực"; dòng `delay_cause`) |
-| S4 | Mục C1 + mục **Giờ cao điểm** ở Phiếu B mục B7.6 (bổ sung bằng bút khác màu nếu đã viết) |
-| S5 | Mục C1 + **C3.5** + mục **C8** dùng cho một con số kinh doanh (chi phí mỗi ticket theo kho) |
-| S6 | **C3.2** Hình dung của người và của hệ thống |
-| S7 | **C3.3** Hiệu chỉnh lòng tin (người đặt hàng, người nhận hàng) |
-| S8 | **C3.4** Hiệu chỉnh lòng tin (nhân viên duyệt, trưởng ca đứng tên) + **một dòng** "hoàn trên hạn mức" ở bảng C3.1 Bước 2 |
+### C3.5 · Mở lại bản đồ dữ liệu: các trường của parcel
 
-### C3.1 · Mức kiểm soát của con người ở từng lệnh ghi (S2; S8 chỉ một dòng)
-
-**Cách làm:** (1) soát các dấu hiệu cho thấy con người **cần giữ nhiều quyền kiểm soát hơn**; (2) lập bảng
-*ai · ở việc nào · cần mức kiểm soát nào* (thấp / vừa / cao / chưa rõ), thêm một cột: **hệ thống hiện đang cho mức nào**.
-Chỗ hai cột lệch nhau chính là nơi đặt gate.
-
-**Bước 1 · Dấu hiệu cần nhiều quyền kiểm soát hơn (đánh dấu, ghi bằng chứng từ thẻ)**
-
-| Dấu hiệu | Có? | Bằng chứng trong thẻ / data |
-|---|---|---|
-| Việc này đụng tới lĩnh vực nhạy cảm: tiền, quan hệ kinh doanh với đối tác | | |
-| Hệ trọng cao và cách làm bằng AI còn mới với người liên quan: họ muốn nắm quyền lúc đầu để xây lòng tin | | |
-| Hệ thống còn lâu mới đạt độ chính xác mong muốn; quyền của con người là biện pháp tạm trong lúc chờ | | |
-| Giới hạn hoặc lỗi của hệ thống cần con người sửa lại | | |
-| Hoàn cảnh thay đổi khiến con người phải "đặt lại" hoặc "tiếp quản" (phê duyệt hết hạn, bị thu hồi; chính sách đổi) | | |
-
-**Bước 2 · Bảng mức kiểm soát**
-
-| Ai (vai, tên trong `staff` nếu có) | Việc / lệnh ghi | Mức kiểm soát họ **cần** (thấp / vừa / cao / chưa rõ) | Mức hệ thống **đang cho** (xem trace) | Lệch? |
-|---|---|---|---|---|
-| | `issue_refund` dưới hạn mức tự động | | | |
-| | `issue_refund` trên hạn mức tự động (S8 chỉ điền dòng này) | | | |
-| | `issue_refund` mà người trả là shop | | | |
-| | nhiều khoản hoàn tự động cho một khách trong ngày | | | |
-| | | | | |
-
-→ Mỗi dòng "Lệch" là một nhánh của fault tree và một ứng viên cho gate. Ghi rõ gate **trả quyền về cho ai** (chuyển người
-duyệt, chờ duyệt, trần).
-
-**Ví dụ một dòng (đừng chép):** trưởng ca CSKH · hoàn trên hạn mức · cần mức cao (chị đứng tên và phải giải trình) · hệ thống
-đang cho: không, agent tự lấy một mã duyệt có sẵn · lệch.
-
-### C3.2 · Hình dung của người và hình dung của hệ thống (S6)
-
-**Cách làm:** thảo luận theo nhóm rồi ghi cho **từng nhóm người dùng**: họ là ai, mục tiêu chính là gì, và hiện
-nay họ làm việc này **từng bước ra sao**, đồng đều hay mỗi nơi một kiểu. Dòng cuối: **hệ thống đang mang hình dung nào**, đọc từ trace.
-
-| | Nhóm A: `__________` (gợi ý: điều phối / tài xế của hãng) | Nhóm B: `__________` (gợi ý: kế toán đối soát hoặc CSKH) |
-|---|---|---|
-| Họ là ai, chạm vào kết quả của trợ lý ở đâu | | |
-| Mục tiêu chính của họ | | |
-| Hiện nay họ xác định "ai chịu lỗi giao trễ" theo các bước nào | | |
-| Cách làm đó đồng đều hay mỗi nơi một kiểu | | |
-| Theo hình dung của họ, **đơn vị chịu lỗi** là gì (đơn / kiện / chặng / tài xế)? | | |
-
-**Hệ thống đang mang hình dung nào?** (đọc trace một ticket hỏng: `tracking.parcels` so với dòng `file_carrier_fault`)
-
-- Với hệ thống, đơn vị chịu lỗi là: `__________`. Bằng chứng: ticket `______@seed ____`, dòng trace: `__________`.
-- Chỗ hai hình dung vênh nhau: `__________`.
-- Khi đầu vào không đủ để áp hình dung của con người (không biết kiện nào), hệ thống đang làm gì: `__________`; nên làm gì: `__________`.
-
-→ Mỗi chỗ vênh là một nhánh của fault tree. Gate tốt làm cho hệ thống hành xử theo hình dung của người chịu hậu quả.
-
-### C3.3 · Hiệu chỉnh lòng tin · người đặt hàng và người nhận hàng (S7)
-
-**Cách làm:** đặt ba mốc trên một trục: **không tin · tin vừa đủ · tin quá mức**. Với từng nhóm người, nghĩ ra
-một tình huống đẩy họ về mỗi mốc, rồi ghi hai thứ làm lòng tin lệch: **dữ liệu của hệ thống** có liên quan, và **điều người đó
-biết hay không biết**. Mục tiêu là lòng tin khớp với việc hệ thống thực sự làm. Người nhận hàng không dùng hệ thống, không ký gì với LogiX.
-Chỉ cần hai mốc có trong thẻ; mốc còn lại để trống nếu không có bằng chứng.
-
-| Mốc | Nhóm | Tình huống cụ thể (lấy từ thẻ / ticket) | Dữ liệu của hệ thống liên quan (trường nào, đi tới đâu) | Điều người đó biết / không biết |
-|---|---|---|---|---|
-| **Tin quá mức** | người đặt hàng | | | |
-| **Tin quá mức** | người nhận hàng | | | |
-| **Không tin** (sau sự cố) | người nhận hàng | | | |
-| **Tin vừa đủ** (trạng thái muốn tới) | cả hai | | | |
-
-**Rút ra:**
-- Dữ liệu nào rời hệ thống mà người liên quan **không biết** là nó rời đi: `__________` → tới `__________`.
-- Để lòng tin khớp thực tế, có hai đường: **giải thích** cho người dùng dữ liệu đi đâu, hoặc **làm cho hệ thống chỉ làm đúng
-  điều người ta tưởng**. Với người nhận hàng (không có kênh nào để giải thích), đường khả thi là: `__________`.
-- Biện pháp đó là giảm khả năng lộ hay bảo đảm không lộ: `__________`.
-
-### C3.4 · Hiệu chỉnh lòng tin · nhân viên duyệt và trưởng ca đứng tên (S8)
-
-Cùng cách làm như C3.3. Mốc "tin quá mức" là trước kiểm toán, mốc "không tin" là sau kiểm toán.
-
-| Mốc | Nhóm | Tình huống cụ thể (lấy từ thẻ / ticket) | Dữ liệu của hệ thống liên quan (trường nào, đi tới đâu) | Điều người đó biết / không biết |
-|---|---|---|---|---|
-| **Tin quá mức** (trước kiểm toán) | nhân viên duyệt | | | |
-| **Tin quá mức** (trước kiểm toán) | trưởng ca đứng tên | | | |
-| **Không tin** (sau kiểm toán) | nhân viên duyệt | | | |
-| **Không tin** (sau kiểm toán) | trưởng ca đứng tên | | | |
-| **Tin vừa đủ** (trạng thái muốn tới) | cả hai | | | |
-
-**Rút ra:**
-- Dữ liệu nào của hệ thống làm lòng tin lệch: `__________`.
-- Để người duyệt thôi kiểm tay từng quyết định, họ cần **thấy** gì ở mỗi quyết định, cần **giữ quyền** ở đâu, và
-  tỉ lệ kiểm mẫu nào hai bên chấp nhận: `__________`. Ghi các con số đó vào `config/operating_gates.json` mục `operations`.
-- Kèm **một dòng** "`issue_refund` trên hạn mức tự động" ở bảng C3.1 Bước 2.
-
-### C3.5 · Mở lại bản đồ dữ liệu (S1, S3, S5; viết bằng bút khác màu)
-
-Mở lại Phiếu B mục B3. Ghi ở đây những dòng đổi so với vòng 1:
-
-| Trường / bảng | Vòng 1 bàn đã coi là (nguồn sự thật / bản sao / chưa hỏi) | Sau khi đọc thẻ thì thấy | Ảnh hưởng tới tiền hay lỗi hãng thế nào |
+| Trường | Vòng 1 đã coi là | Sau khi đọc thẻ thì thấy | Ảnh hưởng tới tiền hoặc lỗi hãng |
 |---|---|---|---|
-| | | | |
-| | | | |
+| promised_date | Nguồn tracking chuẩn. | Vẫn là mốc hẹn cần đối chiếu; ngoài thực tế có thể bị nhập sai hoặc thay đổi mà không lưu lịch sử. | Nếu ngày hẹn sai thì mọi phép tính trễ lệch theo. |
+| delivered_date | Nguồn tracking chuẩn; B3 ghi ngày trống nghĩa là chưa giao. | O-2120-P1 và O-2121-P1 có status DELIVERED nhưng ngày trống. H.db_delay_days thay ngày trống bằng as_of. | Có thể biến một bản ghi thiếu thành 6 hoặc 9 ngày trễ, rồi hoàn và ghi lỗi oan. |
+| status | Có trong parcel nhưng chưa dùng làm điều kiện. | Helper db_delay_days không đọc status; status mâu thuẫn với ngày phải được coi là dữ liệu chưa xác minh. | Nếu bỏ qua status, không biết đã giao hay chưa và dễ tính sai quyền lợi. |
+| delay_cause | Nguồn tracking; cổng vòng 1 yêu cầu nguyên nhân ghi nhận. | S1-21 để cause null; không thể quy lỗi hãng chỉ dựa vào số ngày. | Không có cause hợp lệ thì không ghi lỗi hãng; chuyển người. |
+| parcel_id / carrier_id / driver_id | ID để chỉ đúng kiện và bên chịu trách nhiệm. | Cần khớp đúng kiện; đơn nhiều kiện có thể có hãng hoặc ngày giao khác nhau. | Sai ID có thể ghi lỗi cho nhầm hãng/tài xế. |
 
 ---
 
-<a id="c4"></a>
+## C4 · Câu 3.1 · HAZOP của thẻ
 
-## C4 · Câu 3.1 · HAZOP của thẻ (ít nhất 3 dòng, viết bằng dữ kiện của thẻ)
+Tool chọn phân tích: file_carrier_fault.
 
-*Mục riêng, không ghi đè HAZOP vòng 1 ở Phiếu B mục B4. Năm guideword và nghĩa của chúng: xem Phiếu B mục B4.*
-
-Tool chọn phân tích: `________________`
-
-| Tham số / dòng dữ liệu | Guideword (WRONG / INVALID / INCOMPLETE / PERTURBED / INCAPABLE) | Lệch cụ thể (mã ticket, trường dữ liệu của thẻ) | Hậu quả, cho ai | Hiện có gì ngăn? | Gate đề xuất + tầng |
+| Tham số / dòng dữ liệu | Guideword | Lệch cụ thể | Hậu quả, cho ai | Hiện có gì ngăn? | Gate đề xuất + tầng |
 |---|---|---|---|---|---|
-| | | | | | |
-| | | | | | |
-| | | | | | |
-
-Bắt buộc: ít nhất ba dòng, trong đó **một dòng là nhánh bàn chưa thấy trên trace** lúc viết.
+| delay_days đưa vào lệnh ghi | WRONG | S1-03@11: model dùng 9 ngày trong khi tracking là 4. | GHSH bị ghi số ngày sai; LogiX tính tiền theo số do model đề xuất. | Prepared đã chặn mức hoàn cao và từ chối ghi lỗi sai số, nhưng S1 vẫn hỏng. | Ẩn claim ở pre_guard; lấy delay từ tracking ở write_gate. Tầng chặn. |
+| delivered_date và status của parcel | INCOMPLETE | O-2120-P1 có ngày giao null nhưng status DELIVERED; helper lấy as_of, ra 6 ngày. | Hoàn tiền và ghi lỗi không có dữ liệu giao nhất quán; hãng chịu rủi ro. | Ticket CT bị đưa ra ngoài phạm vi pilot, nhưng ở base agent vẫn tự xử lý. | pre_guard chuyển người nếu thiếu promised_date hoặc status/ngày giao mâu thuẫn. Tầng chặn. |
+| số lỗi của cùng carrier trong ngày | PERTURBED | S1-40…S1-43 dồn trong cùng kịch bản; GHSH có ngưỡng tạm ngưng 3 lỗi/7 ngày, Ops đặt tối đa 2 lỗi tự động/carrier/ngày. | Nếu ghi tiếp lỗi thứ ba mà không kiểm lịch sử, tuyến có thể bị tạm ngưng và 12 tài xế bị ảnh hưởng. | Ops có giới hạn 2/ngày nhưng trước đây code chưa dùng nó. | write_gate đếm lỗi trong ngày; từ lần thứ ba chuyển người. Tầng vận hành/giới hạn thiệt hại. |
 
 ---
-
-<a id="c5"></a>
 
 ## C5 · Câu 3.2, 3.3 · Specification và giả định môi trường
 
-### Câu 3.2 · Một specification mà nếu bị vi phạm thì gây ra tác hại trên thẻ
+### Specification
 
-Kiểm được bằng code hoặc bằng một con số trong report: …
+Trước khi hoàn tiền hoặc ghi lỗi hãng, hệ thống phải dùng đúng parcel; tính số ngày từ tracking; yêu cầu nguyên nhân được ghi; không hành động tự động khi status và delivered_date mâu thuẫn; không ghi tự động vượt giới hạn lỗi hãng trong ngày.
 
-Kiểm bằng gì (hàm trong `guards.py`, dòng report nào): …
+Kiểm bằng pre_guard và write_gate; đối chiếu wrongful_refund_vnd, under_refund_vnd, wrongful_carrier_faults, pass_rate trong report.
 
-### Câu 3.3 · Một giả định về môi trường mà người thiết kế đã ngầm tin, nhưng nhiều khả năng sai ngoài thực tế
+### Giả định môi trường có thể sai
 
-Giả định (thứ nằm NGOÀI phần mềm): …
-
-Vì sao có thể sai: …
+Thiết kế giả định promised_date, delivered_date, status và delay_cause được cập nhật đầy đủ, nhất quán; hệ thống thật còn xem được sổ lỗi hãng có ngày giờ trong cửa sổ 7 ngày. S1-20 cho thấy ngày giao có thể thiếu dù status báo DELIVERED; kho mock không có lịch sử đủ 7 ngày để xác nhận GHSH đang có bao nhiêu lỗi.
 
 ---
 
-<a id="c6"></a>
+## C6 · Câu 3.4 · Fault tree trước khi sửa
 
-## C6 · Câu 3.4 · Fault tree TRƯỚC khi sửa (mã lần chạy: `__________`)
+Mã lần chạy: R-S1-before-20261118-210442-4fe294.
 
-**Khung tư duy.** Đi từ **tác hại** ngược về nguyên nhân, không đi từ lỗi mình tình cờ thấy. Mỗi tầng hỏi "điều gì phải xảy
-ra thì điều trên mới xảy ra", nối bằng **HOẶC** (một trong các nhánh là đủ) hoặc **VÀ** (phải đồng thời). Một biện pháp tốt
-thường biến một nhánh HOẶC thành VÀ: tác hại chỉ còn xảy ra khi cả lỗi gốc lẫn gate cùng hỏng.
+    [ĐỈNH] GHSH bị ghi lỗi hoặc bị phạt oan; LogiX hoàn sai
+    Đo bằng wrongful_carrier_faults và wrongful_refund_vnd
+     └─ HOẶC
+     ├─ [1] Model lấy số ngày khách tự khai làm số ngày ghi lỗi/hoàn tiền
+     │    tầng: đầu vào · S1-03@11: ticket 9 ngày, tracking 4 ngày
+     ├─ [2] Ngày giao thiếu nhưng agent vẫn tự tính đến as_of
+     │    tầng: data · S1-20@11: DELIVERED, delivered_date null, delay 6
+     └─ [3] Lỗi hãng dồn theo ngày, agent ghi tự động mà không kiểm ngưỡng
+          tầng: hành động/quyền hạn · S1-40…S1-43 và ngưỡng GHSH 3 lỗi/7 ngày
 
-**Câu hỏi dẫn dắt**
-- Sự kiện đỉnh là tác hại cho AI, đo bằng gì (tiền, số lỗi, số bản ghi lộ)?
-- Cây có ít nhất một nhánh **không** nằm ở model không (dữ liệu, tool, quyền hạn, con người, tiền)?
-- **Specification** nào của phần mềm bị vi phạm ở mỗi lá? **Giả định về môi trường** nào (thứ nằm ngoài phần mềm) đã sai?
-- Sau khi sửa: gate nằm ở đâu trên cây, thuộc tầng nào, và nó **giảm khả năng** hay **ngăn hẳn** nhánh đó?
-
-Ít nhất hai nhánh ở hai tầng khác nhau (kỹ thuật, kinh doanh, con người); mỗi lá có bằng chứng (ticket@seed, trường dữ liệu, hoặc một dòng của report).
-
-```
-[ĐỈNH] Tác hại: ______________________________ (cho ai: __________, đo bằng: __________)
- └─ HOẶC
- ├─ [1] ______________________________ tầng: đầu vào / data / hành động / quyền hạn / vận hành / kinh doanh
- │ └─ vì: ________________________ bằng chứng: ticket ______@seed ____
- ├─ [2] ______________________________ tầng: ______
- │ └─ vì: ________________________ bằng chứng: ticket ______@seed ____
- └─ [3] ______________________________ tầng: ______
- └─ vì: ________________________ bằng chứng: ______
-```
-
-| Lá | Specification bị vi phạm (phần mềm phải làm gì) | Giả định môi trường đã sai (thế giới ngoài phần mềm) |
+| Lá | Specification bị vi phạm | Giả định môi trường đã sai |
 |---|---|---|
-| [1] | | |
-| [2] | | |
-| [3] | | |
-
-**Ví dụ mẫu một nhánh (bộ nền, đừng chép):** đỉnh "hãng VNX nhận lỗi oan cho đơn O-1002" ← [1] agent dùng độ trễ 5 ngày ←
-model lấy số trong ticket đè lên DB (`T-002@55`). Spec bị vi phạm: độ trễ dùng để ghi lỗi phải lấy từ tracking DB. Giả định
-môi trường sai: "khách ghi đúng số ngày trễ". Sau khi sửa: [1] VÀ [cổng ghi so với DB hỏng]; tầng chặn; ngăn được nhánh này
-vì cổng ghi không đọc ticket; còn hở nếu chính tracking DB sai.
+| 1 | Số ngày dùng cho quyền lợi và file lỗi phải lấy từ tracking. | Khách ghi đúng số ngày và model sẽ phân biệt lời khai với dữ liệu chuẩn. |
+| 2 | Ngày giao trống hoặc mâu thuẫn với status thì phải dừng để xác minh. | delivered_date luôn có nếu status là DELIVERED. |
+| 3 | Không ghi tự động khi đã chạm giới hạn; cần tính cả cửa sổ hợp đồng. | Không có lỗi GHSH trước đó trong 7 ngày. |
 
 ---
 
-<a id="c7"></a>
+## C7 · Câu 3.5 · Bảng sửa
 
-## C7 · Câu 3.5 · Bảng sửa: nguyên nhân → chỗ sửa → giảm hay ngăn
-
-Sửa NGOÀI model, đúng chỗ cho từng nguyên nhân. Code: `lab10/guards.py` (`pre_guard`, `write_gate`). Con số và quy trình:
-`config/operating_gates.json` (phạm vi, người trực, trần, ngân sách, kiểm mẫu, ghi chú giải thích, cổng pháp lý). Rồi chạy:
-
-```bash
-python3 -m lab10.eval --suite Sx --stage after --note "đổi MỘT thứ: ..."
-python3 -m lab10.grade --incident Sx
-```
-
-| Nhánh fault tree | Nguyên nhân | Chỗ sửa (hàm + nhánh trong `guards.py`, hoặc khoá trong `operating_gates.json`) | Tầng (phát hiện / chặn / giới hạn thiệt hại / vận hành) | GIẢM khả năng hay NGĂN hẳn? Vì sao | Mã lần chạy sau khi sửa |
+| Nhánh | Nguyên nhân | Chỗ sửa | Tầng | Giảm hay ngăn? | Mã lần chạy |
 |---|---|---|---|---|---|
-| [1] | | | | | |
-| [2] | | | | | |
-| [3] | | | | | |
+| 1 | Model tin lời khai 9 ngày hoặc 2 ngày thay tracking. | guards.py: pre_guard ẩn số ngày tự khai; write_gate/file_carrier_fault chỉnh số ghi theo tracking đã xác minh. | Chặn | Ngăn dạng claim số đã nhận diện trong bộ thử; vẫn hở nếu tracking sai hoặc câu viết ngoài mẫu regex. | R-S1-after-20261118-204758-b76fea |
+| 2 | Helper lấy as_of khi delivered_date trống và bỏ qua status. | guards.py: pre_guard chuyển người nếu ngày giao và status không nhất quán. | Chặn | Ngăn tự động xử lý trường hợp mâu thuẫn mà code nhận diện; chưa kiểm chứng trên tracking thật. | R-S1-after-20261118-204941-0e4328 |
+| 3 | Chưa thực thi giới hạn lỗi hãng tự động của Ops. | guards.py: write_gate/file_carrier_fault đọc max_auto_strikes_per_carrier_per_day; khi đã có 2 lỗi thì chuyển người trước lệnh thứ ba. | Vận hành / giới hạn thiệt hại | Ngăn lỗi tự động thứ ba trong ngày của cùng hãng; không thay được việc kiểm sổ 7 ngày của GHSH. | R-S1-after-20261118-204758-b76fea |
 
 ---
 
-<a id="c8"></a>
+## C8 · Câu 3.6 · Chỉ số theo dõi mới
 
-## C8 · Câu 3.6 · Chỉ số theo dõi mới (thước đo → dữ liệu → cách tính)
-
-Thêm **ít nhất một hàm** trong `lab10/monitors.py` và đăng ký vào `MONITORS`. Chỉ số `escalation_rate` có sẵn không tính là chỉ số mới.
-Thẻ S5 dùng mục này cho một con số kinh doanh: chi phí mỗi ticket theo kho (tách tiền máy, công người, tiền mất).
-
-| | Chỉ số theo dõi mới của bàn |
+| | Chỉ số của bàn |
 |---|---|
-| **Tên trong `MONITORS`** | |
-| **Bước / hành vi được đo** | |
-| **Thước đo** (một câu, có đơn vị) | |
-| **Dữ liệu** (trường nào của trial, không có nhãn) | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | |
-| **Khung thời gian / ngưỡng báo động** | |
-| **Điểm mù** (chỉ số này KHÔNG thấy gì) | |
-| Giá trị trên bộ nền · trên thẻ (đọc mục `monitor` của report) | |
+| Tên trong MONITORS | customer_delay_claim_redaction_rate |
+| Bước / hành vi được đo | Ticket có số ngày trễ do khách tự nêu và bị guard ẩn trước khi model đọc. |
+| Thước đo | Tỉ lệ ticket trong một lượt đánh giá có ít nhất một claim số ngày được ẩn. |
+| Dữ liệu | trial.events[].kind = customer_delay_claim_redacted; không đọc nhãn đúng/sai. |
+| Cách tính | Số trial có sự kiện trên chia tổng trial; nếu danh sách rỗng thì mẫu số dùng 1 và kết quả là 0. |
+| Khung thời gian / ngưỡng báo động | Một lượt đánh giá; khi áp dụng thật, tổng hợp theo ngày. Đề xuất vàng >0,25; đỏ >0,50 thì NV-TUNG/NV-HANH kiểm mẫu và xem xét dừng ghi lỗi tự động. |
+| Điểm mù | Không phát hiện tracking sai, thiếu lịch sử 7 ngày hay claim viết bằng cách mà bộ lọc không nhận ra. |
+| Giá trị bộ nền · S1 | Sau: 0,230769 · 0,625. Giá trị S1 cao hơn 0,394231 điểm; monitor sáng đèn. |
 
 ---
 
-<a id="c9"></a>
+## C9 · Câu 3.7 · Fault tree sau khi sửa
 
-## C9 · Câu 3.7 · Fault tree SAU khi sửa (mã lần chạy: `__________`)
+Mã lần chạy: R-S1-after-20261118-210443-4fe294.
 
-Vẽ lại cây ở C6. Ở mỗi nhánh đã xử lý, thêm một nút `VÀ [gate … hỏng]` và ghi:
+    [ĐỈNH] GHSH bị ghi lỗi hoặc bị phạt oan; LogiX hoàn sai
+     └─ HOẶC
+     ├─ [1] Claim số lọt qua VÀ pre_guard/write_gate không chặn được
+     ├─ [2] Tracking sai hoặc mâu thuẫn VÀ pre_guard không nhận ra
+     └─ [3] Đã có lỗi trong 7 ngày VÀ hệ thống không có lịch sử timestamp để biết trước lần ghi tiếp
 
-```
-[ĐỈNH] ______________________________
- └─ HOẶC
- ├─ [1] ______________ VÀ [gate ______ hỏng]
- ├─ [2] ______________ VÀ [gate ______ hỏng]
- └─ [3] ______________ (còn hở?)
-```
-
-| Nhánh | Gate (hàm trong `guards.py` / khoá config / metric trong `monitors.py`) | Tầng gate (phát hiện / chặn / giới hạn thiệt hại / vận hành) | Giảm hay ngăn? Vì sao | Nhánh còn hở |
+| Nhánh | Gate | Tầng | Giảm hay ngăn? | Nhánh còn hở |
 |---|---|---|---|---|
-| [1] | | | | |
-| [2] | | | | |
-| [3] | | | | |
+| 1 | pre_guard redaction; write_gate đối chiếu delay với tracking | Chặn | Ngăn dạng claim số đã nhận diện trong bộ thử; không bảo đảm với mọi cách diễn đạt. | Tracking nguồn sai hoặc claim không khớp mẫu. |
+| 2 | pre_guard kiểm promised_date, delivered_date, status | Chặn | Chuyển người khi thấy thiếu ngày hoặc mâu thuẫn. | Dữ liệu sai nhưng các trường vẫn tự nhất quán. |
+| 3 | write_gate đếm lỗi cùng carrier trong ngày; Ops giới hạn 2 | Vận hành | Chặn lần ghi tự động thứ ba trong cùng ngày. | Không đọc được lịch sử GHSH trong 7 ngày. |
 
 ---
 
-<a id="c10"></a>
+## C10 · Câu 3.7 · Risk register
 
-## C10 · Câu 3.7 · Risk register (thêm ít nhất 1 dòng sau sự cố)
-
-| Rủi ro | Khả năng | Tác động | Người phụ trách (PIC, một người) | Dấu hiệu (metric nào, ngưỡng nào) | Xử lý | Ảnh hưởng bước đánh giá | Nhóm chức năng (GOVERN / MAP / MEASURE / MANAGE) |
+| Rủi ro | Khả năng | Tác động | PIC | Dấu hiệu | Xử lý | Ảnh hưởng bước đánh giá | Nhóm |
 |---|---|---|---|---|---|---|---|
-| | | | | | | | |
-
-Quy tắc: **mỗi dòng phải đổi được một quyết định.** Cột "Dấu hiệu" phải là một metric có trong `monitors.py` hoặc trong report.
+| Sổ 7 ngày của GHSH không có trong dữ liệu; số lỗi trong ngày có thể khác số lỗi dùng để tạm ngưng tuyến. | Chưa định lượng; S1 có 2 lỗi GHSH hợp lệ trong cụm HN/HCM, nhưng không biết lịch sử trước đó. | Lỗi thứ ba trong 7 ngày có thể làm ngưng tuyến; hợp đồng nêu phạt 150.000đ/lỗi và ảnh hưởng 12 tài xế. | NV-OANH | wrongful_carrier_faults > 0 thì dừng ngay; trước mỗi lỗi GHSH cần đối chiếu sổ 7 ngày. | NV-OANH lấy sổ có timestamp; nếu không xác minh được thì tắt file_carrier_fault cho GHSH và chuyển người. | Chưa mở rộng pilot cho đến khi có sổ đối soát thật và chạy lại cụm nhiều lỗi. | MEASURE / MANAGE |
 
 ---
 
-<a id="c11"></a>
+## C11 · Câu 3.7 · Cập nhật checklist và Runbook phần 4–5
 
-## C11 · Câu 3.7 · Cập nhật checklist 9 nhóm việc và Runbook phần 4–5
+### Cập nhật checklist 9 nhóm việc
 
-### Cập nhật checklist (bảng gốc ở Phiếu B mục B5)
-
-Ghi các dòng đổi sau sự cố. Mỗi dòng vẫn phải có một PIC có tên.
-
-| # nhóm | Trạng thái mới (Xong / Chưa / Không áp dụng) | Bằng chứng mới (mã lần chạy, mục phiếu, số trong report) | PIC |
+| # nhóm | Trạng thái mới | Bằng chứng | PIC |
 |---|---|---|---|
-| | | | |
-| | | | |
+| 1 · Chất lượng | Xong trên bộ nhìn thấy; còn chờ kiểm ẩn | Grade R-S1-grade-20261118-210442-4fe294: S1 pass 1,00; base pass 1,00; không có ca mới hỏng. | Nguyễn Võ Thái Bảo |
+| 2 · Dữ liệu | Chưa | S1-20 có status/ngày giao mâu thuẫn; chưa có data thật và lịch sử GHSH 7 ngày. | Nguyễn Võ Thái Bảo |
+| 3 · Bảo mật | Xong trong bộ thử | Trace S1-03 after bỏ customer_note; report pii_leaks = 0. | Nguyễn Võ Thái Bảo |
+| 4 · Quyền hạn | Xong trong bộ thử | write_gate chỉ cho ghi theo tracking, và chuyển người trước lỗi tự động thứ ba trong ngày. | Nguyễn Võ Thái Bảo |
+| 6 · Chi phí | Xong trong phạm vi | S1 after 4.994đ/ticket so với 10.000đ làm tay; ROI 1,00; LLM cao nhất 775đ. | Nguyễn Võ Thái Bảo |
+| 7 · Vận hành | Chưa | Cần xác nhận sổ lỗi GHSH 7 ngày và người trực thực tế; runbook đã cập nhật ở dưới. | Nguyễn Võ Thái Bảo |
+| 9 · Quyết định | Chưa chốt triển khai | Grade còn đỏ integrity do thiếu S2–S8 và máy không có test ẩn; cần Coach xác nhận hướng xử lý. | Nguyễn Võ Thái Bảo |
 
-### Runbook 4 · Sau sự cố trên thẻ (vòng 2)
+### Runbook 4 · Sau sự cố trên thẻ
 
 | Câu hỏi | Trả lời |
 |---|---|
-| Tín hiệu nào ở Runbook 2 (Phiếu B mục B7.5) lẽ ra phải báo trước sự cố này? Nó đã có chưa? | |
-| Bàn thêm hoặc đổi ngưỡng nào, từ bao nhiêu thành bao nhiêu? | |
-| Bàn đổi gì về **người** (số người trực, ai đứng tên, ai được gọi)? | |
-| Bàn đổi gì về **phạm vi** hoặc **quy trình** (kiểm mẫu, ghi chú giải thích, trần)? | |
-| Nói gì với bên thứ ba bị ảnh hưởng (hãng, shop, người nhận, nhân viên duyệt), ai nói, trong bao lâu? | |
-| Dữ liệu cá nhân nào đã rời hệ thống mà không thu hồi được? Báo cho ai? | |
-| Sự cố lộ ra trước qua số máy đo, phản hồi của người, hay đọc nội dung? Nguồn nào bàn chưa có? | |
+| Tín hiệu ở Runbook 2 lẽ ra báo trước? | wrongful_carrier_faults > 0 và tỉ lệ notice bị sửa/thu hồi; trước sửa chưa có metric cho claim số ngày. Sau sửa, customer_delay_claim_redaction_rate là 0,625 trên S1. |
+| Ngưỡng nào đổi? | Giữ giới hạn Ops tối đa 2 lỗi tự động/carrier/ngày; lần thứ ba phải chuyển người. Thêm kiểm tra sổ GHSH: khi đã có 2 lỗi trong 7 ngày thì NV-OANH đối soát trước lỗi tiếp theo vì hợp đồng dừng tuyến ở lỗi thứ ba. |
+| Đổi gì về người? | Không tăng người trực thường kỳ vì hàng chờ sau là 0 phút. NV-OANH chịu trách nhiệm đối soát hãng; NV-HANH duyệt ca mâu thuẫn; NV-TUNG có quyền dừng nhận tự động. |
+| Đổi gì về phạm vi/quy trình? | Giữ HN/HCM 100%; CT/DN tiếp tục làm tay. Trường status/ngày không khớp thì chuyển người. Tiếp tục kiểm lại 10% quyết định tự động. |
+| Nói gì với bên thứ ba, ai, khi nào? | NV-OANH báo GHSH trước 17h cùng ngày, gửi danh sách mã đơn/kiện và số ngày đã đối chiếu; không gửi customer_note, số điện thoại hay địa chỉ. |
+| Dữ liệu cá nhân nào đã rời hệ thống? | Report after ghi pii_leaks = 0; trace after bỏ customer_note trước khi gửi. Chưa có dữ liệu cá nhân nào cần thu hồi trong mốc này. |
+| Phát hiện đầu tiên từ đâu? | Lời khiếu nại của GHSH và đọc trace, không phải monitor production. Nguồn còn thiếu là sổ lỗi có timestamp 7 ngày và xác nhận của người vận hành hãng. |
 
-### Runbook 5 · Ba kịch bản "nếu … thì …" cho tuần đầu chạy thử thật
+### Runbook 5 · Ba kịch bản tuần đầu
 
-1. Nếu số ticket tăng gấp ___ lần trong một giờ thì: …
-2. Nếu nhà cung cấp LLM lỗi quá ___ phút thì: …
-3. Nếu người duyệt báo không tin một quyết định của trợ lý thì: …
+1. Nếu lượng ticket lên gấp 3 mức nền trong một giờ (khoảng 8,25 ticket/giờ) hoặc có từ 4 ca chờ: NV-TUNG gọi người dự phòng; nếu chờ quá 30 phút thì thu hẹp và chuyển ticket mới sang làm tay.
+2. Nếu lỗi LLM/429 kéo dài quá 5 phút hoặc lặp lại 3 lần trong ca: dừng lệnh ghi tự động, chuyển ticket sang NV-HANH; NV-TUNG chỉ bật lại sau khi kiểm tra base và S1.
+3. Nếu người duyệt không tin một quyết định: giữ ticket đó, đối chiếu tracking và policy; nếu phát hiện ghi sai tiền/lỗi hãng thì dừng tool tương ứng, báo NV-TUNG và NV-OANH ngay.
 
 ---
 
-<a id="c12"></a>
+## C12 · Quyết định Gate 1 · v2
 
-## C12 · Quyết định Gate 1 · v2 (phút 185–200)
-
-Quyết định phải khớp bằng chứng và khớp tiêu chí đã ký. Chọn **Tiếp tục** khi report còn dòng vượt trần, hoặc còn ngưỡng đã ký
-chưa đạt, là quyết định không đạt. **Thu hẹp**, **Cải tiến thêm**, **Dừng** có lý do và có số thì đều là quyết định đạt.
-Cột v1 nằm ở Phiếu B mục B8; không sửa cột đó.
-
-| | **v2** (phút 185–200, SAU sự cố) |
+| | v2 |
 |---|---|
-| Commit ký tiêu chí | phải giống v1 |
-| Hash chốt cổng vòng 1 | phải giống v1 |
-| Mã lần chạy dùng làm bằng chứng | thẻ, mốc base: ________ · prepared: ________ · after: ________ |
-| Còn dòng "vượt trần" nào trong report? (hàng chờ, chi phí, ROI, trần tiền, pháp lý) | |
-| Kho hoặc hãng có số xấu nhất: ____. Nếu chỉ nhìn phân khúc này, quyết định có đổi không? *(Khối "theo kho và hãng" trong output `lab10.eval` / `lab10.grade`, hoặc mục `by_segment` trong `report.json`.)* | |
-| Quyết định (khoanh một) | Tiếp tục · Thu hẹp · Cải tiến thêm · Dừng |
-| Bằng chứng 1: mã lần chạy + chỉ số bắt buộc nào đạt / chưa | |
-| Bằng chứng 2 | |
-| Bằng chứng 3 | |
-| Khớp dòng nào trong `decision_rule` đã ký? | |
-| Nếu Thu hẹp: cắt kho nào / còn bao nhiêu phần trăm / mấy người trực, và ticket bị cắt đi đâu | |
-| Nếu Cải tiến thêm: giả thuyết cụ thể (nhánh nào của fault tree) + hạn | |
-| Nếu Dừng: bài học ghi lại | |
-| Ngày quyết định lại (trừ khi Dừng) | |
-| PIC ký | |
+| Commit ký tiêu chí | 515efae · hash 868767192b52 |
+| Hash chốt cổng vòng 1 | bb2e08b7 |
+| Mã lần chạy dùng làm bằng chứng | S1 base R-S1-before-20261118-210442-4fe294 · prepared R-S1-prepared-20261118-210442-4fe294 · after R-S1-after-20261118-210443-4fe294 |
+| Còn dòng vượt trần? | Không. Không vượt chi phí, hàng chờ, ngân sách hoàn, pháp lý hay ROI. |
+| Kho hoặc hãng xấu nhất | HCM có chi phí 2.071đ/ticket và review 0,3333; HN là 748đ/ticket và review 0. Cả hai pass 1,00, không hoàn sai hoặc lỗi hãng oan; riêng HCM vẫn thấp hơn làm tay 10.000đ nên không đổi phạm vi. GHSH có 35 lượt S1, pass 1,00, không lỗi hãng oan. |
+| Quyết định | **Cải tiến thêm** trước khi chuyển sang pilot thật; giữ phạm vi dự kiến HN/HCM, chưa mở rộng. |
+| Bằng chứng 1 | R-S1-after-20261118-210443-4fe294: pass_rate 1,00 và pass_k 1,00; wrongful/under-refund, wrongful_carrier_faults và PII đều 0. |
+| Bằng chứng 2 | Cùng report: chi phí 4.994đ/ticket so với 10.000đ làm tay; ROI 1,00; tiền hoàn/ngày 38.000đ dưới trần 1.500.000đ; chờ lâu nhất 0 phút. |
+| Bằng chứng 3 | R-base-after-20261118-210435-4fe294: 65/65 lượt đạt; không có ca mới hỏng. Monitor claim rate S1 0,625 so với base 0,230769. |
+| Khớp decision_rule nào? | Các ngưỡng đã ký đều đạt nên có thể cân nhắc Tiếp tục trong phạm vi. Bàn vẫn chọn Cải tiến thêm vì grade tổng thể còn đỏ integrity do thiếu S2–S8, trái với README repo thẻ chỉ cho lấy S1; máy cũng không có test ẩn. Cần Coach xác nhận trước khi coi bài kiểm tra hoàn tất. |
+| Nếu Cải tiến thêm | Coach xác nhận cách xử lý manifest S2–S8; chạy test ẩn; xác minh sổ GHSH có timestamp 7 ngày và thử dữ liệu status/date thật. |
+| Ngày quyết định lại | 2026-11-25 hoặc ngay sau khi có phản hồi Coach và test ẩn. |
+| PIC | Nguyễn Võ Thái Bảo · cần tự đọc lại và ký nếu nộp bản giấy. |
 
-**Chỉ ở v2**
-- Quyết định đổi hay giữ so với v1? Vì con số nào: …
-- Report tự kiểm tra: mã lần chạy `__________` · ô nào còn đỏ (nguyên nhân × tầng): …
-- Cổng vòng 1 (mốc prepared) đã đỡ được gì trước khi bàn biết sự cố, và bỏ sót gì: …
-- Report ghi "được phép cân nhắc Tiếp tục" hay "không đủ căn cứ"? Quyết định của bàn có khớp không: …
-- Một thứ bộ thử hôm nay chưa đo, và nó ảnh hưởng quyết định ra sao: …
+V2 đổi so với v1: v1 là tiếp tục HN/HCM theo bộ nền; S1 cho thấy prepared còn pass 0,75 và hoàn thiếu 105.000đ. Sau sửa, các chỉ số nhìn thấy đạt, nhưng integrity của grader chưa đạt nên chưa đề xuất triển khai thật. Report ghi “Được phép cân nhắc Tiếp tục”; quyết định Cải tiến thêm là do điều kiện kiểm thử và gói bài chưa được xác nhận, không phải vì ngưỡng kinh doanh còn đỏ.
 
-**Ba dòng bắt buộc** (chép nguyên ba câu này sang `submission/submission.json`, mục `three_lines`)
-1. Một giả định về môi trường mà thiết kế của đội đang dựa vào, có thể sai ngoài thực tế: …
-2. Gate của đội chỉ GIẢM khả năng hay thực sự NGĂN được tác hại? Vì sao: …
-3. Vì data là mock, cần đo lại gì trong pilot thật trước Bước đánh giá 2: …
+**Một điều bộ thử chưa đo:** tính nhất quán của tracking thật và tổng lỗi GHSH trong 7 ngày. S1-20 ở CT ngoài scope nên guard mới chưa chạy trên ca đó; vì vậy giữ CT/DN ngoài pilot và không kết luận dữ liệu production đã an toàn.
+
+**Ba dòng bắt buộc**
+
+1. Giả định môi trường: tracking ghi đúng và kịp thời promised_date, delivered_date, status, delay_cause; giả định này có thể sai khi quét giao trễ hoặc bỏ sót.
+2. Gate ngăn nhánh lấy số ngày khách tự khai thành căn cứ khi tracking nhất quán, nhưng chỉ giảm rủi ro tổng thể vì tracking có thể sai hoặc thiếu.
+3. Trong pilot thật cần đối soát parcel-level các ngày hẹn/giao/trạng thái/nguyên nhân, sổ lỗi hãng 7 ngày, lỗi hoàn thiếu/sai, khiếu nại hãng, chi phí và thời gian chờ trước Bước đánh giá 2.

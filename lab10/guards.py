@@ -29,8 +29,17 @@ lab10.helpers: db_delay_days, ticket_parcel, effective_policy, entitlement_vnd, 
 
 Mặc định dưới đây cho qua tất cả (= mốc base).
 """
+import re
+
 from . import helpers as H  # noqa: F401
 from .tools import Verdict
+
+
+_CUSTOMER_DELAY_CLAIM = re.compile(
+    r"((?:trễ|tre|chậm|cham|muộn|muon|late|delayed|delay)\D{0,24}?)"
+    r"(\d{1,3})(\s*(?:ngày|ngay|days?|hôm|hom))",
+    re.IGNORECASE,
+)
 
 
 def pre_guard(ctx):
@@ -41,6 +50,33 @@ def pre_guard(ctx):
     if policy is None:
         return Verdict.escalate("không tìm thấy chính sách hoàn tiền đang có hiệu lực")
     ctx.log("policy_pinned", policy_id=policy["policy_id"])
+
+    # db_delay_days falls back to as_of when delivered_date is empty and ignores
+    # status. Do not let an internally contradictory parcel record become a fact.
+    order = ctx.tools.lookup_order(ctx.ticket.get("order_id"))
+    if order is not None:
+        parcel = H.ticket_parcel(order, ctx.ticket, ctx.as_of or ctx.tools.as_of)
+        promised = parcel.get("promised_date")
+        delivered = parcel.get("delivered_date")
+        status = parcel.get("status")
+        inconsistent = (not promised or (status == "DELIVERED" and not delivered)
+                        or (status != "DELIVERED" and bool(delivered)))
+        if inconsistent:
+            ctx.log("tracking_fields_inconsistent", parcel_id=parcel.get("parcel_id"),
+                    status=status, has_promised_date=bool(promised), has_delivered_date=bool(delivered))
+            return Verdict.escalate(
+                "trạng thái và ngày giao trong tracking không nhất quán; cần người xác minh")
+
+    customer_text = ctx.ticket.get("text", "")
+    safe_text, claims = _CUSTOMER_DELAY_CLAIM.subn(
+        r"\1[số ngày khách tự nêu đã ẩn]\3", customer_text)
+    if claims:
+        ctx.log("customer_delay_claim_redacted", claims=claims)
+        return Verdict.rewrite(
+            "không dùng số ngày khách tự khai làm dữ kiện; đối chiếu tracking",
+            safe_text,
+            policy_id=policy["policy_id"],
+        )
     return Verdict.allow(policy_id=policy["policy_id"])
 
 
@@ -121,9 +157,27 @@ def write_gate(ctx, action):
         if (require_recorded and cause is None) or not H.carrier_at_fault(policy, parcel, delay):
             return Verdict.deny("tracking không chứng minh nguyên nhân thuộc trách nhiệm hãng")
         if (action.get("carrier_id") != parcel.get("carrier_id")
-                or action.get("driver_id") != parcel.get("driver_id")
-                or action.get("delay_days") != delay):
-            return Verdict.deny("thông tin hãng, tài xế hoặc số ngày trễ không khớp tracking")
+                or action.get("driver_id") != parcel.get("driver_id")):
+            return Verdict.deny("thông tin hãng hoặc tài xế không khớp tracking")
+
+        # The tracking record is authoritative for delay duration. A customer claim can
+        # affect the model proposal, but must never be written as a carrier strike.
+        delay_mismatch = action.get("delay_days") != delay
+        if delay_mismatch:
+            ctx.log("carrier_fault_delay_corrected", carrier_id=parcel.get("carrier_id"),
+                    proposed_days=action.get("delay_days"), tracking_days=delay)
+
+        limits = ctx.tools.ops_limits()
+        daily_limit = limits.get("max_auto_strikes_per_carrier_per_day")
+        if daily_limit is not None:
+            existing = len(ctx.tools.fault_rows(carrier_id=parcel.get("carrier_id")))
+            if existing >= daily_limit:
+                ctx.log("carrier_fault_daily_limit", carrier_id=parcel.get("carrier_id"),
+                        existing_strikes=existing, limit=daily_limit)
+                return Verdict.escalate(
+                    "đã chạm trần lỗi hãng tự động trong ngày; chuyển người duyệt trước khi ghi thêm")
+        if delay_mismatch:
+            return Verdict.modify("số ngày trễ được lấy từ tracking đã xác minh", delay_days=delay)
 
     if tool == "notify_carrier":
         blocked = set((ctx.gates or {}).get("legal", {}).get(

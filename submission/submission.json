@@ -4,11 +4,11 @@
     "NguyenVoThaiBao-2A202603638"
   ],
   "incident": "S1",
-  "decision_v1": "Tiếp tục trong phạm vi HN/HCM",
-  "decision_v2": "",
+  "decision_v1": "Tiếp tục",
+  "decision_v2": "Cải tiến thêm",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Tracking luôn ghi đúng và kịp thời ngày hẹn, ngày giao, trạng thái và nguyên nhân giao trễ.",
+    "reduce_or_prevent": "Gate chặn số ngày khách tự khai khi tracking nhất quán, nhưng không ngăn được lỗi nếu chính tracking sai hoặc thiếu.",
+    "measure_in_pilot": "Đối soát ngày hẹn/ngày giao/trạng thái/nguyên nhân, sổ lỗi hãng 7 ngày, hoàn sai/thiếu, khiếu nại, chi phí và hàng chờ."
   }
 }
