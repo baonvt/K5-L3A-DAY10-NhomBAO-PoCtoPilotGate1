@@ -2,42 +2,33 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm (`TenNhom`, không dấu, không khoảng trắng):
-- Lớp: `L3A` / `L3B`
-- Repo của bàn: `K5-<L3A|L3B>-DAY10-<TenNhom>-PoCtoPilotGate1`
-- Thẻ sự cố đã bốc (S1–S8):
+- Tên nhóm (`TenNhom`, không dấu, không khoảng trắng): `NhomBAO`
+- Lớp: `L3A`
+- Repo bài làm: `K5-L3A-DAY10-NhomBAO-PoCtoPilotGate1`
+- Thẻ sự cố đã bốc (S1–S8): chưa bốc
 
 ## Thành viên
 
-Họ tên đầy đủ và MSSV của **mọi** thành viên; thêm dòng nếu cần. Vai: Kỹ sư cổng · Sản phẩm và kinh doanh · Vận hành và pháp lý (README mục 3, phút 0–15).
-
 | STT | Họ và tên | MSSV | Vai | Trưởng nhóm |
 | --: | --------- | ---- | --- | :---------: |
-|   1 |           |      |     |             |
-|   2 |           |      |     |             |
-|   3 |           |      |     |             |
-|   4 |           |      |     |             |
-
-Ghi `members` trong `submission/submission.json` theo dạng `"HoVaTen-MSSV"`, khớp bảng trên.
+| 1 | Nguyễn Võ Thái Bảo | 2A202603638 | Kỹ sư cổng; Sản phẩm và kinh doanh; Vận hành và pháp lý | Có |
 
 ## Cá nhân
 
-Mỗi thành viên tự viết một mục bên dưới (chép mẫu, đổi tiêu đề thành họ tên không dấu và MSSV, ví dụ `## NguyenVanAn-20241234`).
-
-## HoVaTen-MSSV
+## NguyenVoThaiBao-2A202603638
 
 ### Phần việc phụ trách
 
-Vai trong bàn; câu nào của đề, mục nào của phiếu A/B/C, file nào (`lab10/guards.py`, `config/operating_gates.json`, …).
+Phụ trách ba vai của lab. Làm các câu 1.1–3.7 và phiếu A, B, C; đọc trace, chỉnh `lab10/guards.py`, điền config, thêm monitor, hoàn thiện submission.
 
 ### Đóng góp cụ thể
 
-...
+Đã đọc README, RULES, RUBRIC, SUBMISSION và tham chiếu PRD/eval card Lab 9. Có dùng AI để giải thích cấu trúc repo, đọc dữ liệu mô phỏng, đề xuất guard và soạn nháp câu trả lời. Tôi cần tự xem lại các ngưỡng, kết quả chạy và quyết định trước khi ký/nộp.
 
 ### Bằng chứng
 
-Mã commit, mã lần chạy (`runs/<mã>`), dòng trong phiếu.
+Điền mã commit, mã lần chạy và mục phiếu sau khi hoàn thành các mốc trong lớp.
 
 ### Exit ticket
 
-Một điều học được, một điều còn chưa chắc.
+Tự viết sau buổi học: một điều tôi hiểu rõ hơn và một điều tôi còn chưa chắc.
